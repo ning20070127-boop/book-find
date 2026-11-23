@@ -6,13 +6,17 @@ app = Flask(__name__, template_folder="../templates")
 API_URL = "https://openlibrary.org/search.json"
 FIELDS = "title,author_name,first_publish_year,cover_i,isbn,key"
 HEADERS = {"User-Agent": "UniBookPortal/1.0 (student-project@example.com)"}
+SEARCH_ALIASES = {
+    "魔道祖師": 'title:"Mo Dao Zu Shi" OR title:"Grandmaster of Demonic Cultivation"',
+    "魔道祖师": 'title:"Mo Dao Zu Shi" OR title:"Grandmaster of Demonic Cultivation"',
+}
 
 
 def search_books(query):
     # Open Library rejects plain queries shorter than three characters. A
     # title/author field query keeps short Chinese terms searchable.
-    api_query = query
-    if len(query) < 3:
+    api_query = SEARCH_ALIASES.get(query, query)
+    if api_query == query and len(query) < 3:
         phrase = query.replace("\\", "\\\\").replace('"', '\\"')
         api_query = f'title:"{phrase}" OR author:"{phrase}"'
 
@@ -47,10 +51,15 @@ def search_books(query):
         isbns = item.get("isbn")
         term = quote(str(isbns[0] if isinstance(isbns, list) and isbns else title), safe="")
         cover_id = item.get("cover_i")
+        cover_url = None
+        if cover_id:
+            cover_url = f"https://covers.openlibrary.org/b/id/{cover_id}-M.jpg?default=false"
+        elif isinstance(isbns, list) and isbns and isbns[0]:
+            cover_url = f"https://covers.openlibrary.org/b/isbn/{quote(str(isbns[0]), safe='')}-M.jpg?default=false"
         books.append({
             "title": title, "author": author,
             "year": item.get("first_publish_year") or "年份未知",
-            "cover_url": f"https://covers.openlibrary.org/b/id/{cover_id}-M.jpg?default=false" if cover_id else None,
+            "cover_url": cover_url,
             "links": {
                 "kingstone": f"https://www.kingstone.com.tw/search/key/{term}/",
                 "readmoo": f"https://readmoo.com/search/keyword?q={term}",
