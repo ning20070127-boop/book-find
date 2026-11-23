@@ -9,14 +9,15 @@ HEADERS = {"User-Agent": "UniBookPortal/1.0 (student-project@example.com)"}
 
 
 def search_books(query):
-    # Open Library rejects q values shorter than three characters with HTTP 422.
-    # Handle this locally so short searches get actionable feedback instead of
-    # looking like a broken search request.
+    # Open Library rejects plain queries shorter than three characters. A
+    # title/author field query keeps short Chinese terms searchable.
+    api_query = query
     if len(query) < 3:
-        return [], "Open Library 至少需要 3 個字元才能搜尋。請補充更完整的書名或作者，例如再加上作品名稱。"
+        phrase = query.replace("\\", "\\\\").replace('"', '\\"')
+        api_query = f'title:"{phrase}" OR author:"{phrase}"'
 
     try:
-        response = requests.get(API_URL, params={"q": query, "limit": 12, "fields": FIELDS}, headers=HEADERS, timeout=6)
+        response = requests.get(API_URL, params={"q": api_query, "limit": 12, "fields": FIELDS}, headers=HEADERS, timeout=6)
         response.raise_for_status()
         payload = response.json()
         if not isinstance(payload, dict) or not isinstance(payload.get("docs"), list):
