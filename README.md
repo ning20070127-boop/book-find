@@ -1,10 +1,11 @@
 # 校園找書｜Book Portal
 
-專為大學生設計的書籍搜尋入口。使用 Open Library 查詢書目，並提供金石堂、Readmoo 與 HyRead 的搜尋跳轉，方便比較購買與圖書館借閱選項。
+專為大學生設計的書籍搜尋入口。中文查詢優先使用金石堂在地書目與封面，英文及其他查詢使用 Open Library；搜尋結果可分頁瀏覽，並提供金石堂、Readmoo 與 HyRead 跳轉。
 
 ## 功能
 
-- 依書名、作者或 ISBN 搜尋 Open Library。
+- 依書名、作者或 ISBN 搜尋；中文查詢使用金石堂在地書目，其他查詢使用 Open Library。
+- 搜尋結果分頁呈現，可瀏覽來源提供的完整結果集。
 - 顯示書名、最多兩位作者、首刷年份與封面，缺少資料時提供友善預設內容。
 - 提供金石堂實體書、Readmoo 電子書及 HyRead 圖書館搜尋連結。
 - Flask Serverless Function，適用 Vercel Python Runtime。
